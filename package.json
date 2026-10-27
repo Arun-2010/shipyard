@@ -1,0 +1,27 @@
+{
+  "name": "shipyard",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "db:migrate": "pnpm --filter @shipyard/db migrate",
+    "db:generate": "pnpm --filter @shipyard/db generate"
+  },
+  "prettier": "@shipyard/config/prettier",
+  "devDependencies": {
+    "@shipyard/config": "workspace:*",
+    "eslint": "10.13.0",
+    "prettier": "3.6.2",
+    "turbo": "2.11.10",
+    "typescript": "5.9.3"
+  }
+}

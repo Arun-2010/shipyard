@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String    @id @default(cuid())
+  githubId  String    @unique // GitHub's numeric user id, stored as text
+  login     String // GitHub username
+  name      String?
+  avatarUrl String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[]
+}
+
+model Project {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slug           String   @unique // becomes <slug>.<domain>
+  repoUrl        String
+  installCommand String
+  buildCommand   String
+  outputDir      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  deployments Deployment[] @relation("ProjectDeployments")
+
+  // The deployment the router serves. Switching it is a single-row update,
+  // which is what makes rollback instant.
+  activeDeploymentId String?     @unique
+  activeDeployment   Deployment? @relation("ActiveDeployment", fields: [activeDeploymentId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+
+enum DeploymentStatus {
+  QUEUED
+  BUILDING
+  READY
+  FAILED
+  CANCELLED
+}
+
+model Deployment {
+  id           String           @id @default(cuid())
+  projectId    String
+  project      Project          @relation("ProjectDeployments", fields: [projectId], references: [id], onDelete: Cascade)
+  activeFor    Project?         @relation("ActiveDeployment")
+  commitSha    String?
+  status       DeploymentStatus @default(QUEUED)
+  errorMessage String?
+  createdAt    DateTime         @default(now())
+  startedAt    DateTime?
+  finishedAt   DateTime?
+  durationMs   Int?
+
+  @@index([projectId, createdAt])
+}

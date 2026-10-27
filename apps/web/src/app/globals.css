@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+/* shadcn-style design tokens, exposed as Tailwind colors (bg-primary, text-muted-foreground, ...) */
+@theme {
+  --color-background: #ffffff;
+  --color-foreground: #09090b;
+  --color-muted: #f4f4f5;
+  --color-muted-foreground: #71717a;
+  --color-border: #e4e4e7;
+  --color-ring: #a1a1aa;
+  --color-primary: #18181b;
+  --color-primary-foreground: #fafafa;
+  --color-destructive: #dc2626;
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
+}

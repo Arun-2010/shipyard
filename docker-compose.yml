@@ -1,0 +1,41 @@
+# Local infrastructure only — the apps themselves run on the host via `pnpm dev`.
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: shipyard
+      POSTGRES_PASSWORD: shipyard
+      POSTGRES_DB: shipyard
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      # Runs once, on first start with an empty volume: creates the test database.
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shipyard"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  minio:
+    # MinIO stopped publishing images to Docker Hub in 2025; Chainguard builds it from source.
+    image: cgr.dev/chainguard/minio:latest
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: shipyard
+      MINIO_ROOT_PASSWORD: shipyard-secret
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # web console
+    volumes:
+      - minio-data:/data
+
+volumes:
+  postgres-data:
+  minio-data:

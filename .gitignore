@@ -1,0 +1,16 @@
+node_modules/
+.turbo/
+.next/
+dist/
+coverage/
+next-env.d.ts
+*.log
+*.tsbuildinfo
+
+# Prisma client is generated on install
+packages/db/src/generated/
+
+# Local secrets
+.env
+.env.*
+!.env.example
